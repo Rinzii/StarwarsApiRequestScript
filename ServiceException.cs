@@ -1,4 +1,4 @@
-﻿namespace CleGuards2023SoftDev;
+﻿namespace StarwarsApiScript;
 
 public class ServiceException : Exception
 {
