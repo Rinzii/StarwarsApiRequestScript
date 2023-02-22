@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace StarwarsApiScript;
@@ -11,19 +10,16 @@ namespace StarwarsApiScript;
 /// </summary>
 public class PlanetService : IPlanetService
 {
-    private readonly HttpClient _httpClient;
     private readonly IPlanetRepository _planetRepository;
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<PlanetService> _logger;
 
     public PlanetService(
-        HttpClient httpClient, 
         IPlanetRepository planetRepository, 
         IMemoryCache memoryCache,
         ILogger<PlanetService> logger
         )
     {
-        _httpClient = httpClient;
         _planetRepository = planetRepository;
         _memoryCache = memoryCache;
         _logger = logger;
@@ -36,12 +32,14 @@ public class PlanetService : IPlanetService
     /// <returns></returns>
     public async Task<Planet?> GetPlanetByIdAsync(int id)
     {
+        // Create a memory cache key for the planet with the given ID.
         var cacheKey = $"planet_{id}";
         if (_memoryCache.TryGetValue(cacheKey, out Planet? planet))
         {
             return planet;
         }
 
+        // If the planet is not in the cache, get it from the Star Wars API.
         try
         {
             planet = await _planetRepository.GetPlanetByIdAsync(id);
@@ -50,7 +48,7 @@ public class PlanetService : IPlanetService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to get planet by ID: {id}");
+            _logger.LogError(ex, $"Failed to get planet by ID: {id} from Repository");
             throw;
         }
     }
@@ -61,12 +59,14 @@ public class PlanetService : IPlanetService
     /// <returns></returns>
     public async Task<List<Planet>?> GetAllPlanetsAsync()
     {
+        // Create a memory cache key for the list of planets.
         var cacheKey = "planets";
         if (_memoryCache.TryGetValue(cacheKey, out List<Planet>? planets))
         {
             return planets;
         }
 
+        // If the list of planets is not in the cache, get it from the Star Wars API.
         try
         {
             planets = await _planetRepository.GetAllPlanetsAsync();
@@ -75,7 +75,7 @@ public class PlanetService : IPlanetService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get all planets");
+            _logger.LogError(ex, "Failed to get all planets from Repository");
             throw;
         }
     }

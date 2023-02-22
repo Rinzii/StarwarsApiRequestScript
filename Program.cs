@@ -22,7 +22,7 @@ class Program
             csvWriter.Write(planets);
             
             // Log the number of planets we got.
-            logger.LogInformation($"Number of planets: {planets.Count}");
+            logger.LogInformation($"Number of planets: {planets!.Count}");
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ class Program
         }
 
         // Added to make it easier to know when the program has finished.
-        // In a production environment this would be removed.
+        // In a production environment this would be removed or replaced.
         Console.WriteLine("DONE!");
     }
 

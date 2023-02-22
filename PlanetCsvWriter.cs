@@ -30,7 +30,7 @@ public class PlanetCsvWriter
 
             // Write each planet as a row in the CSV file
             foreach (var planet in planets)
-            {
+            { // These \" are needed to work around CSV files escaping rules as some of the data contains commas
                 streamWriter.WriteLine($"\"{planet.Name}\",\"{planet.Diameter}\",\"{planet.Climate}\",\"{planet.Gravity}\",\"{planet.Population}\"");
             }
         }

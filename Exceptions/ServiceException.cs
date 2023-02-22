@@ -1,4 +1,4 @@
-﻿namespace StarwarsApiScript;
+﻿namespace StarwarsApiScript.Exceptions;
 
 public class ServiceException : Exception
 {

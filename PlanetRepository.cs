@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using CleGuards2023SoftDev.Exceptions;
 
 namespace StarwarsApiScript;
 
@@ -21,25 +22,24 @@ public class PlanetRepository : IPlanetRepository
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    /// <exception cref="HttpRequestException"></exception>
+    /// <exception cref="ApiException"></exception>
     public async Task<Planet?> GetPlanetByIdAsync(int id)
     {
-        var response = await _httpClient.GetAsync($"https://swapi.dev/api/planets/{id}");
+        var planet = await _httpClient.GetFromJsonAsync<Planet>($"https://swapi.dev/api/planets/{id}");
 
-        if (!response.IsSuccessStatusCode)
+        if (planet == null)
         {
-            throw new HttpRequestException($"Failed to get planet with ID {id}.");
+            throw new ApiException($"Failed to get planet with ID {id} from API.");
         }
 
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<Planet>(json);
+        return planet;
     }
 
     /// <summary>
     /// Asynchronously gets a list of all the planets from the Star Wars API.
     /// </summary>
     /// <returns>list of planets</returns>
-    /// <exception cref="HttpRequestException"></exception>
+    /// <exception cref="ApiException"></exception>
     public async Task<List<Planet>?> GetAllPlanetsAsync()
     {
         var planets = new List<Planet>();
@@ -47,15 +47,12 @@ public class PlanetRepository : IPlanetRepository
 
         while (!string.IsNullOrEmpty(nextUrl))
         {
-            var response = await _httpClient.GetAsync(nextUrl);
-
-            if (!response.IsSuccessStatusCode)
+            var planetList = await _httpClient.GetFromJsonAsync<PlanetListResponse>(nextUrl);
+            
+            if (planetList == null)
             {
-                throw new HttpRequestException("Failed to get planets.");
+                throw new ApiException($"Failed to get planet list from API.");
             }
-
-            var json = await response.Content.ReadAsStringAsync();
-            var planetList = JsonSerializer.Deserialize<PlanetListResponse>(json);
 
             planets.AddRange(planetList.Planets);
             nextUrl = planetList.Next;

@@ -19,9 +19,3 @@ public class Planet
     [JsonPropertyName("population")]
     public string Population { get; set; }
 }
-
-
-
-
-
-
